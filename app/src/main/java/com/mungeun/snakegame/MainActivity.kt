@@ -1,4 +1,4 @@
-package com.example.snakegame
+package com.mungeun.snakegame
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -6,12 +6,11 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.snakegame.ui.theme.SnakeGameTheme
-import com.example.snakegame.ui.theme.snake.SnakeGame
+import com.mungeun.snakegame.ui.theme.SnakeGameTheme
+import com.mungeun.snakegame.ui.theme.snake.SnakeGame
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

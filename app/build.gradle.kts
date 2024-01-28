@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.snakegame"
+    namespace = "com.mungeun.snakegame"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.snakegame"
+        applicationId = "com.mungeun.snakegame"
         minSdk = 24
         targetSdk = 33
         versionCode = 1

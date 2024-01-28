@@ -1,4 +1,4 @@
-package com.example.snakegame.ui.theme.snake
+package com.mungeun.snakegame.ui.theme.snake
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -35,6 +35,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import kotlin.random.Random
 
@@ -65,6 +66,7 @@ fun SnakeGame() {
     var gameSpeed by remember { mutableStateOf(50L) } // Game speed in milliseconds
     var snakeSpeed by remember { mutableStateOf(200L) } // Snake movement speed in milliseconds
     var lastMoveTime by remember { mutableStateOf(0L) } // Time when the snake last moved
+    var gameScore by remember { mutableStateOf(0) }
 
     LaunchedEffect(gameId) {
         while (!isGameOver) {
@@ -75,7 +77,7 @@ fun SnakeGame() {
                 lastMoveTime = System.currentTimeMillis() // Update the last move time
             }
             if (snake.first() == food) {
-                // Snake ate the food, generate new food and grow the snake
+                gameScore++
                 food = generateFood(snake, gridSize)
                 snake = growSnake(snake, direction, gridSize)
             }
@@ -99,6 +101,7 @@ Box(modifier = Modifier.fillMaxSize()) {
                 direction = Direction.RIGHT
                 food = generateFood(snake, gridSize)
                 isGameOver = false
+                gameScore= 0
                 gameId++ // 게임 재시작 트리거
             }) {
                 Text("Restart")
@@ -106,7 +109,7 @@ Box(modifier = Modifier.fillMaxSize()) {
         }
     } else {
         // Game board
-        GameBoard(snake, food, gridSize, direction, { direction = it })
+        GameBoard(snake, food, gridSize, direction,gameScore ,{ direction = it })
     }
 }
 }
@@ -119,6 +122,7 @@ fun GameBoard(
     food: Cell,
     gridSize: Int,
     currentDirection: Direction,
+    gameScore : Int,
     onDirectionChange: (Direction) -> Unit
 ) {
     Column(
@@ -126,10 +130,15 @@ fun GameBoard(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        Text(text = "Score : $gameScore", color = Color.Red, fontSize = 20.sp)
+        Spacer(modifier = Modifier.height(16.dp))
         Grid(snake, food, gridSize)
         Spacer(modifier = Modifier.height(16.dp))
         Controls(currentDirection, onDirectionChange)
     }
+
+
+
 }
 
 // The game grid
@@ -144,7 +153,7 @@ fun Grid(snake: List<Cell>, food: Cell, gridSize: Int) {
                     Box(
                         modifier = Modifier
                             .size(cellSize)
-                            .border(border = BorderStroke(0.2.dp,Color.LightGray))
+                            .border(border = BorderStroke(0.2.dp, Color.LightGray))
                             .background(
                                 when (Cell(j, i)) {
                                     in snake -> Color.Green // Snake cell
