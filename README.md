@@ -6,4 +6,4 @@
 피드백은 언제나 환영합니다.✨
 
 👍스크린샷
-![화면1](screenshots/gymforyou_1.png "화면1")
+![화면1](screenshots/1.png "화면1")
