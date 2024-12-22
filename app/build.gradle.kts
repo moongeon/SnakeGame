@@ -1,9 +1,8 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("org.jlleitschuh.gradle.ktlint")
 }
-val ktlint by configurations.creating
-
 
 android {
     namespace = "com.mungeun.snakegame"
@@ -27,7 +26,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
@@ -52,11 +51,6 @@ android {
 }
 
 dependencies {
-    ktlint("com.pinterest.ktlint:ktlint-cli:1.5.0") {
-        attributes {
-            attribute(Bundling.BUNDLING_ATTRIBUTE, objects.named(Bundling.EXTERNAL))
-        }
-    }
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
     implementation("androidx.activity:activity-compose:1.8.0")
@@ -72,58 +66,4 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
-}
-
-val ktlintCheck by tasks.registering(JavaExec::class) {
-    group = LifecycleBasePlugin.VERIFICATION_GROUP
-    description = "Check Kotlin code style"
-    classpath = ktlint
-    mainClass.set("com.pinterest.ktlint.Main")
-    // see https://pinterest.github.io/ktlint/install/cli/#command-line-usage for more information
-    args(
-        "**/src/**/*.kt",
-        "**.kts",
-        "!**/build/**",
-    )
-}
-
-tasks.check {
-    dependsOn(ktlintCheck)
-}
-
-tasks.register<JavaExec>("ktlintFormat") {
-    group = LifecycleBasePlugin.VERIFICATION_GROUP
-    description = "Check Kotlin code style and format"
-    classpath = ktlint
-    mainClass.set("com.pinterest.ktlint.Main")
-    jvmArgs("--add-opens=java.base/java.lang=ALL-UNNAMED")
-    // see https://pinterest.github.io/ktlint/install/cli/#command-line-usage for more information
-    args(
-        "-F",
-        "**/src/**/*.kt",
-        "**.kts",
-        "!**/build/**",
-    )
-}
-
-tasks.register("copyGitHooks", Copy::class.java) {
-    description = "Copies the git hooks from /git-hooks to the .git folder."
-    group = "git hooks"
-    from("$rootDir/scripts/pre-commit")
-    into("$rootDir/.git/hooks/")
-}
-tasks.register("installGitHooks", Exec::class.java) {
-    description = "Installs the pre-commit git hooks from /git-hooks."
-    group = "git hooks"
-    workingDir = rootDir
-    commandLine = listOf("chmod")
-    args("-R", "+x", ".git/hooks/")
-    dependsOn("copyGitHooks")
-    doLast {
-        logger.info("Git hook installed successfully.")
-    }
-}
-
-afterEvaluate {
-    tasks.getByName("installGitHooks").dependsOn("copyGitHooks")
 }

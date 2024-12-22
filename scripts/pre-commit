@@ -1,0 +1,28 @@
+#!/bin/bash
+echo "
+===================
+|  Formatting code with ktlintFormat...
+===================
+"
+./gradlew ktlintFormat
+
+if [ $? -ne 0 ]; then
+  echo "❌ Formatting failed. Commit aborted."
+  exit 1
+fi
+
+echo "
+===================
+|  Running ktlintCheck...r
+===================
+"
+
+./gradlew --no-daemon --stacktrace -PdisablePreDex ktlintCheck
+
+if [ $? -ne 0 ]; then
+  echo "❌ Code style check failed. Commit aborted."
+  exit 1
+fi
+
+echo "✅ All checks passed. Proceeding with commit."
+exit 0

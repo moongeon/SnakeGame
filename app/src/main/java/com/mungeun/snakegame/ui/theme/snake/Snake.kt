@@ -25,9 +25,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,10 +42,11 @@ import kotlin.random.Random
 data class Cell(val x: Int, val y: Int)
 
 enum class Direction {
-    UP, DOWN, LEFT, RIGHT
+    UP,
+    DOWN,
+    LEFT,
+    RIGHT,
 }
-
-
 
 @Composable
 fun SnakeGame() {
@@ -57,8 +58,8 @@ fun SnakeGame() {
         mutableStateOf(
             generateFood(
                 snake,
-                gridSize
-            )
+                gridSize,
+            ),
         )
     } // Initial position of the food
     var isGameOver by remember { mutableStateOf(false) } // 게임 상태
@@ -86,34 +87,33 @@ fun SnakeGame() {
     }
 
 // Game screen
-Box(modifier = Modifier.fillMaxSize()) {
-    if (isGameOver) {
-        // Game over screen
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(text = "Game Over!", color = Color.Red)
-            Button(onClick = {
-                // Restart the game
-                snake = listOf(Cell(5, 5))
-                direction = Direction.RIGHT
-                food = generateFood(snake, gridSize)
-                isGameOver = false
-                gameScore= 0
-                gameId++ // 게임 재시작 트리거
-            }) {
-                Text("Restart")
+    Box(modifier = Modifier.fillMaxSize()) {
+        if (isGameOver) {
+            // Game over screen
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+            ) {
+                Text(text = "Game Over!", color = Color.Red)
+                Button(onClick = {
+                    // Restart the game
+                    snake = listOf(Cell(5, 5))
+                    direction = Direction.RIGHT
+                    food = generateFood(snake, gridSize)
+                    isGameOver = false
+                    gameScore = 0
+                    gameId++ // 게임 재시작 트리거
+                }) {
+                    Text("Restart")
+                }
             }
+        } else {
+            // Game board
+            GameBoard(snake, food, gridSize, direction, gameScore, { direction = it })
         }
-    } else {
-        // Game board
-        GameBoard(snake, food, gridSize, direction,gameScore ,{ direction = it })
     }
 }
-}
-
 
 // Game board and controls
 @Composable
@@ -122,13 +122,13 @@ fun GameBoard(
     food: Cell,
     gridSize: Int,
     currentDirection: Direction,
-    gameScore : Int,
-    onDirectionChange: (Direction) -> Unit
+    gameScore: Int,
+    onDirectionChange: (Direction) -> Unit,
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
     ) {
         Text(text = "Score : $gameScore", color = Color.Red, fontSize = 20.sp)
         Spacer(modifier = Modifier.height(16.dp))
@@ -136,14 +136,15 @@ fun GameBoard(
         Spacer(modifier = Modifier.height(16.dp))
         Controls(currentDirection, onDirectionChange)
     }
-
-
-
 }
 
 // The game grid
 @Composable
-fun Grid(snake: List<Cell>, food: Cell, gridSize: Int) {
+fun Grid(
+    snake: List<Cell>,
+    food: Cell,
+    gridSize: Int,
+) {
     val cellSize = 16.dp
 
     Column(modifier = Modifier.background(color = Color.Red)) {
@@ -151,16 +152,17 @@ fun Grid(snake: List<Cell>, food: Cell, gridSize: Int) {
             Row {
                 for (j in 0 until gridSize) {
                     Box(
-                        modifier = Modifier
-                            .size(cellSize)
-                            .border(border = BorderStroke(0.2.dp, Color.LightGray))
-                            .background(
-                                when (Cell(j, i)) {
-                                    in snake -> Color.Green // Snake cell
-                                    food -> Color.Red // Food cell
-                                    else -> Color.White // Empty cell
-                                }
-                            )
+                        modifier =
+                            Modifier
+                                .size(cellSize)
+                                .border(border = BorderStroke(0.2.dp, Color.LightGray))
+                                .background(
+                                    when (Cell(j, i)) {
+                                        in snake -> Color.Green // Snake cell
+                                        food -> Color.Red // Food cell
+                                        else -> Color.White // Empty cell
+                                    },
+                                ),
                     )
                 }
             }
@@ -170,32 +172,35 @@ fun Grid(snake: List<Cell>, food: Cell, gridSize: Int) {
 
 // Controls for the game
 @Composable
-fun Controls(currentDirection: Direction, onDirectionChange: (Direction) -> Unit) {
+fun Controls(
+    currentDirection: Direction,
+    onDirectionChange: (Direction) -> Unit,
+) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(16.dp)
+        modifier = Modifier.padding(16.dp),
     ) {
         Row(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(8.dp)
+            modifier = Modifier.padding(8.dp),
         ) {
             // Up button
             ControlButton(
                 imageVector = Icons.Default.KeyboardArrowUp,
-                contentDescription = "Up"
+                contentDescription = "Up",
             ) {
                 if (currentDirection != Direction.DOWN) onDirectionChange(Direction.UP)
             }
         }
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.padding(8.dp)
+            modifier = Modifier.padding(8.dp),
         ) {
             // Left button
             ControlButton(
                 imageVector = Icons.Default.KeyboardArrowLeft,
-                contentDescription = "Left"
+                contentDescription = "Left",
             ) {
                 if (currentDirection != Direction.RIGHT) onDirectionChange(Direction.LEFT)
             }
@@ -205,7 +210,7 @@ fun Controls(currentDirection: Direction, onDirectionChange: (Direction) -> Unit
             // Right button
             ControlButton(
                 imageVector = Icons.Default.KeyboardArrowRight,
-                contentDescription = "Right"
+                contentDescription = "Right",
             ) {
                 if (currentDirection != Direction.LEFT) onDirectionChange(Direction.RIGHT)
             }
@@ -213,16 +218,15 @@ fun Controls(currentDirection: Direction, onDirectionChange: (Direction) -> Unit
         Row(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(8.dp)
+            modifier = Modifier.padding(8.dp),
         ) {
             // Down button
             ControlButton(
                 imageVector = Icons.Default.KeyboardArrowDown,
-                contentDescription = "Down"
+                contentDescription = "Down",
             ) {
                 if (currentDirection != Direction.UP) onDirectionChange(Direction.DOWN)
             }
-
         }
     }
 }
@@ -231,59 +235,78 @@ fun Controls(currentDirection: Direction, onDirectionChange: (Direction) -> Unit
 fun ControlButton(
     imageVector: ImageVector,
     contentDescription: String,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     IconButton(
-        modifier = Modifier
-            .clip(
-                RoundedCornerShape(20.dp)
-            )
-            .background(color = Color.LightGray),
-        onClick = onClick
+        modifier =
+            Modifier
+                .clip(
+                    RoundedCornerShape(20.dp),
+                )
+                .background(color = Color.LightGray),
+        onClick = onClick,
     ) {
-        Icon(modifier = Modifier
-            .size(80.dp), imageVector = imageVector, contentDescription = contentDescription)
+        Icon(
+            modifier =
+                Modifier
+                    .size(80.dp),
+            imageVector = imageVector,
+            contentDescription = contentDescription,
+        )
     }
 }
 
-
-
-fun moveSnake(snake: List<Cell>, direction: Direction) : List<Cell>{
+fun moveSnake(
+    snake: List<Cell>,
+    direction: Direction,
+): List<Cell> {
     val head = snake.first()
-    val nextHead = when(direction){
-     Direction.UP -> Cell(head.x,head.y-1)
-        Direction.DOWN -> Cell(head.x,head.y+1)
-        Direction.LEFT -> Cell(head.x-1,head.y)
-        Direction.RIGHT -> Cell(head.x+1,head.y)
-    }
+    val nextHead =
+        when (direction) {
+            Direction.UP -> Cell(head.x, head.y - 1)
+            Direction.DOWN -> Cell(head.x, head.y + 1)
+            Direction.LEFT -> Cell(head.x - 1, head.y)
+            Direction.RIGHT -> Cell(head.x + 1, head.y)
+        }
     val newSnake = snake.toMutableList()
     newSnake.add(0, nextHead)
     newSnake.removeAt(newSnake.size - 1)
     return newSnake
-
 }
 
 // Grows the snake in the given direction and returns the new snake
-fun growSnake(snake: List<Cell>, direction: Direction, gridSize: Int): List<Cell> {
-    val growth = when (direction) {
-        Direction.UP -> Cell(snake.first().x, (snake.first().y - 1 + gridSize) % gridSize)
-        Direction.DOWN -> Cell(snake.first().x, (snake.first().y + 1) % gridSize)
-        Direction.LEFT -> Cell((snake.first().x - 1 + gridSize) % gridSize, snake.first().y)
-        Direction.RIGHT -> Cell((snake.first().x + 1) % gridSize, snake.first().y)
-    }
+fun growSnake(
+    snake: List<Cell>,
+    direction: Direction,
+    gridSize: Int,
+): List<Cell> {
+    val growth =
+        when (direction) {
+            Direction.UP -> Cell(snake.first().x, (snake.first().y - 1 + gridSize) % gridSize)
+            Direction.DOWN -> Cell(snake.first().x, (snake.first().y + 1) % gridSize)
+            Direction.LEFT -> Cell((snake.first().x - 1 + gridSize) % gridSize, snake.first().y)
+            Direction.RIGHT -> Cell((snake.first().x + 1) % gridSize, snake.first().y)
+        }
     return listOf(growth) + snake
 }
 
 // Generates a new food cell not occupied by the snake
-fun generateFood(snake: List<Cell>, gridSize: Int): Cell {
-    val emptyCells = (0 until gridSize).flatMap { x ->
-        (0 until gridSize).map { y -> Cell(x, y) }
-    }.filter { it !in snake }
+fun generateFood(
+    snake: List<Cell>,
+    gridSize: Int,
+): Cell {
+    val emptyCells =
+        (0 until gridSize).flatMap { x ->
+            (0 until gridSize).map { y -> Cell(x, y) }
+        }.filter { it !in snake }
     return emptyCells[Random.nextInt(emptyCells.size)]
 }
 
 // Checks if the game is over
-fun checkGameOver(snake: List<Cell>, gridSize: Int): Boolean {
+fun checkGameOver(
+    snake: List<Cell>,
+    gridSize: Int,
+): Boolean {
     val head = snake.first()
     return head in snake.drop(1) || head.x < 0 || head.y < 0 || head.x >= gridSize || head.y >= gridSize
 }

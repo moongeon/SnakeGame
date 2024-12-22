@@ -27,7 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.mungeun.snakegame.ui.theme.SnakeGameTheme
 
-
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,85 +35,73 @@ class MainActivity : ComponentActivity() {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    color = MaterialTheme.colorScheme.background,
                 ) {
-                    SelectableDropdownMenu(listOf("1","2"))
-                    //SnakeGame()
+                    SelectableDropdownMenu(listOf("1", "2"))
+                    // SnakeGame()
                 }
             }
         }
     }
 }
 
-
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
     SnakeGameTheme {
-        //SnakeGame()
-        SelectableDropdownMenu(listOf("1","2"))
+        // SnakeGame()
+        SelectableDropdownMenu(listOf("1", "2"))
     }
 }
 
-
-
-
-
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
-fun SelectableDropdownMenu(names: List<String>){
-    var isExpanded  by remember { mutableStateOf(false) }
+fun SelectableDropdownMenu(names: List<String>) {
+    var isExpanded by remember { mutableStateOf(false) }
 
     val selectedNames = remember { mutableStateListOf<String>() }
 
     ExposedDropdownMenuBox(expanded = isExpanded, onExpandedChange = {
         isExpanded = !isExpanded
     }) {
-        TextField(value = selectedNames.joinToString(", "),
+        TextField(
+            value = selectedNames.joinToString(", "),
             onValueChange = {},
-            placeholder = { Text(text = "이름 선택")},
+            placeholder = { Text(text = "이름 선택") },
             readOnly = true,
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded) },
             colors = ExposedDropdownMenuDefaults.textFieldColors(),
-            modifier = Modifier.menuAnchor()
+            modifier = Modifier.menuAnchor(),
         )
 
         ExposedDropdownMenu(expanded = isExpanded, onDismissRequest = { isExpanded = false }) {
             names.forEach { name ->
-            AnimatedContent(targetState = selectedNames.contains(name), label = "") { isSelected ->
-                if(isSelected){
-                    DropdownMenuItem(text =  { Text(text = name)}, 
-                        onClick = {
-                        selectedNames.remove(name)
-                    },
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Rounded.Check,
-                                contentDescription = null
-                            )
-                        }
-                    )
-                }else{
-                    DropdownMenuItem(
-                        text = {
-                            Text(text = name)
-                        },
-                        onClick = {
-                            selectedNames.add(name)
-                        },
-                    )
+                AnimatedContent(targetState = selectedNames.contains(name), label = "") { isSelected ->
+                    if (isSelected) {
+                        DropdownMenuItem(
+                            text = { Text(text = name) },
+                            onClick = {
+                                selectedNames.remove(name)
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Rounded.Check,
+                                    contentDescription = null,
+                                )
+                            },
+                        )
+                    } else {
+                        DropdownMenuItem(
+                            text = {
+                                Text(text = name)
+                            },
+                            onClick = {
+                                selectedNames.add(name)
+                            },
+                        )
+                    }
                 }
-
-
             }
-
-            }
-
         }
-
-
     }
-
-
 }
-
